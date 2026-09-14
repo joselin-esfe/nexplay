@@ -1,11 +1,15 @@
 using Microsoft.EntityFrameworkCore;
 using NexPlayAPI.Models;
+using NexPlayAPI.Endpoints;
+using NexPlayAPI.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
 var connectionString = builder.Configuration
     .GetConnectionString("NexPlayConnection")
-    ?? throw new InvalidOperationException("No se encontró la cadena de conexión NexPlayConnection.");
+    ?? throw new InvalidOperationException(
+        "No se encontró la cadena de conexión NexPlayConnection."
+    );
 
 builder.Services.AddDbContext<NexPlayContext>(options =>
     options.UseMySql(
@@ -13,43 +17,29 @@ builder.Services.AddDbContext<NexPlayContext>(options =>
         ServerVersion.AutoDetect(connectionString)
     ));
 
-// Add services to the container.
-builder.Services.AddOpenApi();
+// Servicios de NEXPLAY
+builder.Services.AddScoped<UsuarioService>();
+builder.Services.AddScoped<AuthService>();
+builder.Services.AddScoped<AvatarService>();
+
+// Swagger
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
+// Swagger solo durante desarrollo
 if (app.Environment.IsDevelopment())
 {
-    app.MapOpenApi();
+    app.UseSwagger();
+    app.UseSwaggerUI();
 }
 
 app.UseHttpsRedirection();
 
-var summaries = new[]
-{
-    "Freezing", "Bracing", "Chilly", "Cool", "Mild",
-    "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
-};
-
-app.MapGet("/weatherforecast", () =>
-{
-    var forecast = Enumerable.Range(1, 5).Select(index =>
-        new WeatherForecast
-        (
-            DateOnly.FromDateTime(DateTime.Now.AddDays(index)),
-            Random.Shared.Next(-20, 55),
-            summaries[Random.Shared.Next(summaries.Length)]
-        ))
-        .ToArray();
-
-    return forecast;
-})
-.WithName("GetWeatherForecast");
+// Endpoints de NEXPLAY
+app.MapUsuarioEndpoints();
+app.MapAuthEndpoints();
+app.MapAvatarEndpoints();
 
 app.Run();
-
-record WeatherForecast(DateOnly Date, int TemperatureC, string? Summary)
-{
-    public int TemperatureF => 32 + (int)(TemperatureC / 0.5556);
-}
