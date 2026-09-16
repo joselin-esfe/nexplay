@@ -16,6 +16,7 @@ builder.Services.AddDbContext<NexPlayContext>(options =>
     ));
 
 builder.Services.AddScoped<PartidaService>();
+builder.Services.AddScoped<RetoService>();
 builder.Services.AddOpenApi();
 
 var app = builder.Build();
@@ -28,5 +29,6 @@ if (app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 
 app.MapPartidaEndpoints();
+app.MapRetoEndpoints();
 
 app.Run();
