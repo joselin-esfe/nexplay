@@ -53,4 +53,16 @@ public static class PartidaMapping
             TiempoJugadoSegundos = estadisticas.TiempoJugadoSegundos
         };
     }
+
+    public static MejorPuntajeUsuarioJuegoDto ToDto(this VwMejorPuntajeUsuarioJuego mejorPuntaje)
+    {
+        ArgumentNullException.ThrowIfNull(mejorPuntaje);
+
+        return new MejorPuntajeUsuarioJuegoDto
+        {
+            IdUsuario = mejorPuntaje.IdUsuario,
+            IdJuego = mejorPuntaje.IdJuego,
+            MejorPuntaje = mejorPuntaje.MejorPuntaje
+        };
+    }
 }

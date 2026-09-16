@@ -66,5 +66,11 @@ public static class PartidaEndpoints
 
             return Results.Ok(estadisticas.ToDto());
         });
+
+        group.MapGet("/usuario/{idUsuario:long}/mejor-puntaje", async (ulong idUsuario, PartidaService service) =>
+        {
+            var mejoresPuntajes = await service.ObtenerMejorPuntajePorJuegoAsync(idUsuario);
+            return Results.Ok(mejoresPuntajes);
+        });
     }
 }

@@ -65,4 +65,15 @@ public class PartidaService
             .AsNoTracking()
             .FirstOrDefaultAsync(e => e.IdUsuario == idUsuario);
     }
+
+    public async Task<List<MejorPuntajeUsuarioJuegoDto>> ObtenerMejorPuntajePorJuegoAsync(ulong idUsuario)
+    {
+        var mejores = await _context.VwMejorPuntajeUsuarioJuegos
+            .AsNoTracking()
+            .Where(m => m.IdUsuario == idUsuario)
+            .OrderBy(m => m.IdJuego)
+            .ToListAsync();
+
+        return mejores.Select(m => m.ToDto()).ToList();
+    }
 }
