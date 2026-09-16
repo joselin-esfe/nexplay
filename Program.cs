@@ -18,6 +18,7 @@ builder.Services.AddDbContext<NexPlayContext>(options =>
 builder.Services.AddScoped<PartidaService>();
 builder.Services.AddScoped<RetoService>();
 builder.Services.AddScoped<LogroService>();
+builder.Services.AddScoped<RankingService>();
 builder.Services.AddOpenApi();
 
 var app = builder.Build();
@@ -32,5 +33,6 @@ app.UseHttpsRedirection();
 app.MapPartidaEndpoints();
 app.MapRetoEndpoints();
 app.MapLogroEndpoints();
+app.MapRankingEndpoints();
 
 app.Run();
