@@ -21,6 +21,8 @@ builder.Services.AddDbContext<NexPlayContext>(options =>
 builder.Services.AddScoped<UsuarioService>();
 builder.Services.AddScoped<AuthService>();
 builder.Services.AddScoped<AvatarService>();
+builder.Services.AddScoped<JuegoService>();
+builder.Services.AddScoped<CategoriaJuegoService>();
 
 // Swagger
 builder.Services.AddEndpointsApiExplorer();
@@ -41,5 +43,7 @@ app.UseHttpsRedirection();
 app.MapUsuarioEndpoints();
 app.MapAuthEndpoints();
 app.MapAvatarEndpoints();
+app.MapJuegoEndpoints();
+app.MapCategoriaJuegoEndpoints();
 
 app.Run();
