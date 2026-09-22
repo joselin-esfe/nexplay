@@ -1,6 +1,6 @@
 using Microsoft.EntityFrameworkCore;
-using NexPlayAPI.Models;
 using NexPlayAPI.Endpoints;
+using NexPlayAPI.Models;
 using NexPlayAPI.Services;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -17,12 +17,18 @@ builder.Services.AddDbContext<NexPlayContext>(options =>
         ServerVersion.AutoDetect(connectionString)
     ));
 
-// Servicios de NEXPLAY
+// Servicios de Paola
 builder.Services.AddScoped<UsuarioService>();
 builder.Services.AddScoped<AuthService>();
 builder.Services.AddScoped<AvatarService>();
 builder.Services.AddScoped<JuegoService>();
 builder.Services.AddScoped<CategoriaJuegoService>();
+
+// Servicios de Joselin
+builder.Services.AddScoped<PartidaService>();
+builder.Services.AddScoped<RetoService>();
+builder.Services.AddScoped<LogroService>();
+builder.Services.AddScoped<RankingService>();
 
 // Swagger
 builder.Services.AddEndpointsApiExplorer();
@@ -30,7 +36,6 @@ builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
 
-// Swagger solo durante desarrollo
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
@@ -39,11 +44,17 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
-// Endpoints de NEXPLAY
+// Endpoints de Paola
 app.MapUsuarioEndpoints();
 app.MapAuthEndpoints();
 app.MapAvatarEndpoints();
 app.MapJuegoEndpoints();
 app.MapCategoriaJuegoEndpoints();
+
+// Endpoints de Joselin
+app.MapPartidaEndpoints();
+app.MapRetoEndpoints();
+app.MapLogroEndpoints();
+app.MapRankingEndpoints();
 
 app.Run();
