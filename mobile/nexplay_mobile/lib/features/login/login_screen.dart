@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../core/theme/app_colors.dart';
 import '../../services/api_service.dart';
-import '../games/games_screen.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -44,9 +43,11 @@ class _LoginScreenState extends State<LoginScreen> {
 
     if (result['success'] == true) {
       if (!mounted) return;
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (context) => const GamesScreen()),
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('¡Inicio de sesión exitoso!'),
+          backgroundColor: AppColors.surfaceCard,
+        ),
       );
     } else {
       setState(() {
