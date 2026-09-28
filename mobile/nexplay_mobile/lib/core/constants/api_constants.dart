@@ -4,6 +4,4 @@ class ApiConstants {
   static const String baseUrl = 'http://10.0.2.2:5290';
 
   static const String loginEndpoint = '/api/auth/login';
-  static const String juegosEndpoint = '/api/juegos';
-  static const String categoriasEndpoint = '/api/categorias';
 }

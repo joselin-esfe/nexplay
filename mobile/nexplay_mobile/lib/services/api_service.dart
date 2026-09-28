@@ -2,8 +2,6 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import '../core/constants/api_constants.dart';
-import '../models/game_model.dart';
-import '../models/category_model.dart';
 
 class ApiService {
   // Login
@@ -36,54 +34,6 @@ class ApiService {
       }
     } catch (e) {
       return {'success': false, 'message': 'Error de conexión: $e'};
-    }
-  }
-
-  // Obtener todos los juegos
-  static Future<List<GameModel>> getJuegos() async {
-    final url = Uri.parse('${ApiConstants.baseUrl}${ApiConstants.juegosEndpoint}');
-    try {
-      final response = await http.get(url);
-      if (response.statusCode == 200) {
-        List<dynamic> body = jsonDecode(response.body);
-        return body.map((dynamic item) => GameModel.fromJson(item)).toList();
-      } else {
-        throw Exception('Error al cargar juegos: ${response.statusCode}');
-      }
-    } catch (e) {
-      throw Exception('Error de conexión: $e');
-    }
-  }
-
-  // Obtener categorías
-  static Future<List<CategoryModel>> getCategorias() async {
-    final url = Uri.parse('${ApiConstants.baseUrl}${ApiConstants.categoriasEndpoint}');
-    try {
-      final response = await http.get(url);
-      if (response.statusCode == 200) {
-        List<dynamic> body = jsonDecode(response.body);
-        return body.map((dynamic item) => CategoryModel.fromJson(item)).toList();
-      } else {
-        throw Exception('Error al cargar categorías: ${response.statusCode}');
-      }
-    } catch (e) {
-      throw Exception('Error de conexión: $e');
-    }
-  }
-
-  // Obtener juegos por categoría
-  static Future<List<GameModel>> getJuegosPorCategoria(int categoriaId) async {
-    final url = Uri.parse('${ApiConstants.baseUrl}${ApiConstants.categoriasEndpoint}/$categoriaId/juegos');
-    try {
-      final response = await http.get(url);
-      if (response.statusCode == 200) {
-        List<dynamic> body = jsonDecode(response.body);
-        return body.map((dynamic item) => GameModel.fromJson(item)).toList();
-      } else {
-        throw Exception('Error al cargar juegos de la categoría: ${response.statusCode}');
-      }
-    } catch (e) {
-      throw Exception('Error de conexión: $e');
     }
   }
 }
