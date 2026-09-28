@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+
+import '../../core/routes/app_routes.dart';
 import '../../core/theme/app_colors.dart';
 import '../../services/api_service.dart';
 
@@ -37,18 +39,13 @@ class _LoginScreenState extends State<LoginScreen> {
       _contrasenaController.text.trim(),
     );
 
+    if (!mounted) return;
     setState(() {
       _isLoading = false;
     });
 
     if (result['success'] == true) {
-      if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('¡Inicio de sesión exitoso!'),
-          backgroundColor: AppColors.surfaceCard,
-        ),
-      );
+      Navigator.of(context).pushReplacementNamed(AppRoutes.home);
     } else {
       setState(() {
         _errorMessage = result['message'] ?? 'Error al iniciar sesión';
@@ -63,7 +60,10 @@ class _LoginScreenState extends State<LoginScreen> {
       body: SafeArea(
         child: Center(
           child: SingleChildScrollView(
-            padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 16.0),
+            padding: const EdgeInsets.symmetric(
+              horizontal: 24.0,
+              vertical: 16.0,
+            ),
             child: ConstrainedBox(
               constraints: const BoxConstraints(maxWidth: 420),
               child: Form(
@@ -79,7 +79,10 @@ class _LoginScreenState extends State<LoginScreen> {
                         decoration: BoxDecoration(
                           shape: BoxShape.circle,
                           color: AppColors.surfaceCard,
-                          border: Border.all(color: AppColors.primary.withValues(alpha: 0.5), width: 2),
+                          border: Border.all(
+                            color: AppColors.primary.withValues(alpha: 0.5),
+                            width: 2,
+                          ),
                           boxShadow: [
                             BoxShadow(
                               color: AppColors.primary.withValues(alpha: 0.2),
@@ -143,13 +146,18 @@ class _LoginScreenState extends State<LoginScreen> {
                             Container(
                               padding: const EdgeInsets.all(12),
                               decoration: BoxDecoration(
-                                color: AppColors.primary.withValues(alpha: 0.15),
+                                color: AppColors.primary.withValues(
+                                  alpha: 0.15,
+                                ),
                                 borderRadius: BorderRadius.circular(10),
                                 border: Border.all(color: AppColors.primary),
                               ),
                               child: Text(
                                 _errorMessage!,
-                                style: const TextStyle(color: AppColors.primary, fontSize: 13),
+                                style: const TextStyle(
+                                  color: AppColors.primary,
+                                  fontSize: 13,
+                                ),
                                 textAlign: TextAlign.center,
                               ),
                             ),
@@ -160,11 +168,17 @@ class _LoginScreenState extends State<LoginScreen> {
                           TextFormField(
                             controller: _correoController,
                             keyboardType: TextInputType.emailAddress,
-                            style: const TextStyle(color: AppColors.textWhite, fontSize: 15),
+                            style: const TextStyle(
+                              color: AppColors.textWhite,
+                              fontSize: 15,
+                            ),
                             decoration: const InputDecoration(
                               labelText: 'Correo electrónico',
                               labelStyle: TextStyle(color: AppColors.textGray),
-                              prefixIcon: Icon(Icons.email_outlined, color: AppColors.primary),
+                              prefixIcon: Icon(
+                                Icons.email_outlined,
+                                color: AppColors.primary,
+                              ),
                             ),
                             validator: (value) {
                               if (value == null || value.isEmpty) {
@@ -182,14 +196,24 @@ class _LoginScreenState extends State<LoginScreen> {
                           TextFormField(
                             controller: _contrasenaController,
                             obscureText: _obscurePassword,
-                            style: const TextStyle(color: AppColors.textWhite, fontSize: 15),
+                            style: const TextStyle(
+                              color: AppColors.textWhite,
+                              fontSize: 15,
+                            ),
                             decoration: InputDecoration(
                               labelText: 'Contraseña',
-                              labelStyle: const TextStyle(color: AppColors.textGray),
-                              prefixIcon: const Icon(Icons.lock_outline, color: AppColors.primary),
+                              labelStyle: const TextStyle(
+                                color: AppColors.textGray,
+                              ),
+                              prefixIcon: const Icon(
+                                Icons.lock_outline,
+                                color: AppColors.primary,
+                              ),
                               suffixIcon: IconButton(
                                 icon: Icon(
-                                  _obscurePassword ? Icons.visibility_outlined : Icons.visibility_off_outlined,
+                                  _obscurePassword
+                                      ? Icons.visibility_outlined
+                                      : Icons.visibility_off_outlined,
                                   color: AppColors.textGray,
                                 ),
                                 onPressed: () {
@@ -252,18 +276,16 @@ class _LoginScreenState extends State<LoginScreen> {
                       crossAxisAlignment: WrapCrossAlignment.center,
                       children: [
                         const Text(
-                          '¿No tienes cuenta gamer?',
-                          style: TextStyle(color: AppColors.textGray, fontSize: 13),
+                          '¿No tienes cuenta?',
+                          style: TextStyle(
+                            color: AppColors.textGray,
+                            fontSize: 13,
+                          ),
                         ),
                         TextButton(
-                          onPressed: () {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(
-                                content: Text('El registro de cuentas está disponible en el módulo de Registro.'),
-                                backgroundColor: AppColors.surfaceCard,
-                              ),
-                            );
-                          },
+                          onPressed: () =>
+                              Navigator.of(context)
+                                  .pushNamed(AppRoutes.register),
                           child: const Text(
                             'Regístrate',
                             style: TextStyle(

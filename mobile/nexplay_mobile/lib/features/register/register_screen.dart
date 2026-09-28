@@ -83,7 +83,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
     });
 
     try {
-      final createdUser = await _userService.createUser(
+      await _userService.createUser(
         nombreCompleto: _fullNameController.text.trim(),
         correo: _emailController.text.trim(),
         password: _passwordController.text,
@@ -91,16 +91,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
       if (!mounted) return;
 
-      final createdData = {
-        'idUsuario': createdUser.idUsuario,
-        'nombreCompleto': createdUser.nombreCompleto,
-        'correo': createdUser.correo,
-        'apodo': createdUser.apodo,
-        'idAvatar': createdUser.idAvatar,
-      };
-
-      Navigator.of(context)
-          .pushNamed(AppRoutes.profileCreation, arguments: createdData);
+      Navigator.of(context).pushReplacementNamed(AppRoutes.login);
     } catch (error) {
       if (!mounted) return;
       if (error is ApiConnectionException) {

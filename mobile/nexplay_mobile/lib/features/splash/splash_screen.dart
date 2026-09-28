@@ -44,6 +44,7 @@ class _SplashScreenState extends State<SplashScreen>
       vsync: this,
       duration: const Duration(milliseconds: 1100),
     )..forward();
+    unawaited(_refreshConnection());
     _initializePlatform();
     _connectionTimer = Timer.periodic(
       const Duration(seconds: 10),
@@ -53,9 +54,6 @@ class _SplashScreenState extends State<SplashScreen>
 
   Future<void> _initializePlatform() async {
     _setProgress(0.15, 'INICIALIZANDO PLATFORM...');
-    await _refreshConnection();
-    if (!mounted) return;
-
     _setProgress(0.6, 'PREPARANDO RECURSOS...');
     await Future<void>.delayed(const Duration(milliseconds: 280));
     if (!mounted) return;
@@ -265,7 +263,7 @@ class _SplashScreenState extends State<SplashScreen>
                                         setState(() => _buttonHovering = value),
                                     onPressed: () =>
                                         Navigator.of(context)
-                                            .pushNamed(AppRoutes.register),
+                                            .pushNamed(AppRoutes.login),
                                   ),
                                   SizedBox(height: compact ? 18 : 24),
                                   _ProgressStatus(
@@ -309,9 +307,9 @@ class _StatusRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final rightLabel = latencyMs == null
-        ? connectionType
-        : '$connectionType  •  ${latencyMs}ms';
+    final rightLabel = connectionType == 'Sin conexión'
+        ? 'SIN CONEXIÓN'
+        : '$connectionType  •  ${latencyMs ?? '--'} ms';
     return Row(
       children: [
         Expanded(
