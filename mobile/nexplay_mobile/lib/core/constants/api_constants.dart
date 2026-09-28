@@ -1,9 +1,14 @@
 class ApiConstants {
-  // Cambia esta URL fácilmente según el entorno de ejecución.
-  // Web / Chrome: http://localhost:5290
-  // Android Emulator: http://10.0.2.2:5290
+  // URL base actual del backend.
+  // En Android físico seguimos usando localhost gracias a adb reverse.
   static const String baseUrl = 'http://localhost:5290';
 
+  // Endpoints existentes de Paola
   static const String usersEndpoint = '/api/usuarios';
   static const String avatarsEndpoint = '/api/avatares';
+
+  // Endpoints usados por los módulos de Joselin
+  static const String loginEndpoint = '/api/auth/login';
+  static const String juegosEndpoint = '/api/juegos';
+  static const String categoriasEndpoint = '/api/categorias';
 }

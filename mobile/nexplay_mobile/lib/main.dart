@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 
 import 'core/routes/app_routes.dart';
 import 'core/theme/app_theme.dart';
+import 'features/games/games_screen.dart';
+import 'features/login/login_screen.dart';
 import 'features/profile_creation/profile_creation_screen.dart';
 import 'features/register/register_screen.dart';
 import 'features/splash/splash_screen.dart';
@@ -19,42 +21,35 @@ class NexPlayApp extends StatelessWidget {
       title: 'NEXPLAY',
       debugShowCheckedModeBanner: false,
       theme: AppTheme.theme,
+
+      // La aplicación siempre inicia en Splash.
       initialRoute: AppRoutes.splash,
+
       routes: {
+        // Pantallas de Paola
         AppRoutes.splash: (_) => const SplashScreen(),
         AppRoutes.register: (_) => const RegisterScreen(),
-        AppRoutes.loginPlaceholder: (_) => const _LoginPlaceholderScreen(),
-        AppRoutes.homePlaceholder: (_) => const _HomePlaceholderScreen(),
+
+        // Pantallas de Joselin
+        AppRoutes.login: (_) => const LoginScreen(),
+        AppRoutes.games: (_) => const GamesScreen(),
       },
+
+      // Crear Perfil necesita recibir los datos del usuario registrado,
+      // por eso se genera la ruta de manera dinámica.
       onGenerateRoute: (settings) {
         if (settings.name == AppRoutes.profileCreation) {
           final arguments = settings.arguments as Map<String, dynamic>?;
+
           return MaterialPageRoute(
             builder: (_) => ProfileCreationScreen(
               userData: arguments ?? const <String, dynamic>{},
             ),
           );
         }
+
         return null;
       },
     );
-  }
-}
-
-class _LoginPlaceholderScreen extends StatelessWidget {
-  const _LoginPlaceholderScreen();
-
-  @override
-  Widget build(BuildContext context) {
-    return const Scaffold(body: Center(child: Text('Login pendiente')));
-  }
-}
-
-class _HomePlaceholderScreen extends StatelessWidget {
-  const _HomePlaceholderScreen();
-
-  @override
-  Widget build(BuildContext context) {
-    return const Scaffold(body: Center(child: Text('Home pendiente')));
   }
 }
