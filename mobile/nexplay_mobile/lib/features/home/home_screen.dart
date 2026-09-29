@@ -237,13 +237,14 @@ class _HomeContent extends StatelessWidget {
                           _QuickActions(
                             onGames: onGames,
                             onRanking: () {
-                              onComingSoon('Ranking');
+                              Navigator.of(context)
+                                  .pushNamed(AppRoutes.ranking);
                             },
                             onChallenges: () {
-                              onComingSoon('Retos');
+                              Navigator.of(context).pushNamed(AppRoutes.retos);
                             },
                             onAchievements: () {
-                              onComingSoon('Logros');
+                              Navigator.of(context).pushNamed(AppRoutes.logros);
                             },
                           ),
 
@@ -262,7 +263,8 @@ class _HomeContent extends StatelessWidget {
 
             _BottomNavigation(
               onGames: onGames,
-              onRanking: () => onComingSoon('Ranking'),
+              onRanking: () =>
+                  Navigator.of(context).pushNamed(AppRoutes.ranking),
               onProfile: onProfile,
             ),
           ],

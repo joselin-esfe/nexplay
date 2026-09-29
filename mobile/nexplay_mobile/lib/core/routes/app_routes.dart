@@ -6,4 +6,11 @@ class AppRoutes {
   static const String home = '/home';
   static const String games = '/games';
   static const String profile = '/profile';
+
+  static const String retos = '/retos';
+  static const String challengeDetail = '/challenge-detail';
+  static const String logros = '/logros';
+  static const String achievementDetail = '/achievement-detail';
+  static const String ranking = '/ranking';
+  static const String rankingUserDetail = '/ranking-user-detail';
 }

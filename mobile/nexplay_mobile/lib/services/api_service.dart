@@ -6,6 +6,9 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../core/constants/api_constants.dart';
 import '../models/category_model.dart';
 import '../models/game_model.dart';
+import '../models/achievement_model.dart';
+import '../models/challenge_model.dart';
+import '../models/ranking_user_model.dart';
 
 class ApiService {
   static Future<Map<String, dynamic>> login(
@@ -59,10 +62,10 @@ class ApiService {
 
       return {
         'success': false,
-        'message': errorBody.isNotEmpty ? errorBody : 'Credenciales inválidas',
+        'message': errorBody.isNotEmpty ? errorBody : 'Credenciales invÃ¡lidas',
       };
     } catch (e) {
-      return {'success': false, 'message': 'Error de conexión: $e'};
+      return {'success': false, 'message': 'Error de conexiÃ³n: $e'};
     }
   }
 
@@ -82,7 +85,7 @@ class ApiService {
 
       throw Exception('Error al cargar juegos: ${response.statusCode}');
     } catch (e) {
-      throw Exception('Error de conexión: $e');
+      throw Exception('Error de conexiÃ³n: $e');
     }
   }
 
@@ -100,9 +103,9 @@ class ApiService {
         return body.map((item) => CategoryModel.fromJson(item)).toList();
       }
 
-      throw Exception('Error al cargar categorías: ${response.statusCode}');
+      throw Exception('Error al cargar categorÃ­as: ${response.statusCode}');
     } catch (e) {
-      throw Exception('Error de conexión: $e');
+      throw Exception('Error de conexiÃ³n: $e');
     }
   }
 
@@ -123,11 +126,107 @@ class ApiService {
       }
 
       throw Exception(
-        'Error al cargar juegos de la categoría: '
+        'Error al cargar juegos de la categorÃ­a: '
         '${response.statusCode}',
       );
     } catch (e) {
-      throw Exception('Error de conexión: $e');
+      throw Exception('Error de conexiÃ³n: $e');
     }
+  }
+
+  static Future<List<ChallengeModel>> getRetos() async {
+    final url = Uri.parse(
+      '${ApiConstants.baseUrl}${ApiConstants.retosEndpoint}',
+    );
+
+    try {
+      final response = await http.get(url);
+
+      if (response.statusCode == 200) {
+        final List<dynamic> body = jsonDecode(response.body);
+        return body.map((item) => ChallengeModel.fromJson(item)).toList();
+      }
+
+      return [];
+    } catch (_) {
+      return [];
+    }
+  }
+
+  static Future<List<AchievementModel>> getLogros() async {
+    final url = Uri.parse(
+      '${ApiConstants.baseUrl}${ApiConstants.logrosEndpoint}',
+    );
+
+    try {
+      final response = await http.get(url);
+
+      if (response.statusCode == 200) {
+        final List<dynamic> body = jsonDecode(response.body);
+        return body.map((item) => AchievementModel.fromJson(item)).toList();
+      }
+
+      return [];
+    } catch (_) {
+      return [];
+    }
+  }
+
+  static Future<List<RankingUserModel>> getRankingGlobal() async {
+    final url = Uri.parse(
+      '${ApiConstants.baseUrl}${ApiConstants.rankingGlobalEndpoint}',
+    );
+
+    try {
+      final response = await http.get(url);
+
+      if (response.statusCode == 200) {
+        final List<dynamic> body = jsonDecode(response.body);
+
+        return body
+            .asMap()
+            .entries
+            .map(
+              (entry) =>
+                  RankingUserModel.fromJson(entry.value, index: entry.key),
+            )
+            .toList();
+      }
+
+      return [];
+    } catch (_) {
+      return [];
+    }
+  }
+
+  static Future<List<RankingUserModel>> getRankingSemanal() async {
+    final url = Uri.parse(
+      '${ApiConstants.baseUrl}${ApiConstants.rankingSemanalEndpoint}',
+    );
+
+    try {
+      final response = await http.get(url);
+
+      if (response.statusCode == 200) {
+        final List<dynamic> body = jsonDecode(response.body);
+
+        return body
+            .asMap()
+            .entries
+            .map(
+              (entry) =>
+                  RankingUserModel.fromJson(entry.value, index: entry.key),
+            )
+            .toList();
+      }
+
+      return [];
+    } catch (_) {
+      return [];
+    }
+  }
+
+  static Future<List<RankingUserModel>> getRankingMensual() async {
+    return [];
   }
 }
