@@ -1,7 +1,8 @@
 class ApiConstants {
-  // URL base actual del backend.
-  // En Android físico seguimos usando localhost gracias a adb reverse.
-  static const String baseUrl = 'http://localhost:5290';
+  static const String baseUrl = String.fromEnvironment(
+    'NEXPLAY_API_BASE_URL',
+    defaultValue: 'http://127.0.0.1:5290',
+  );
 
   // Endpoints existentes de Paola
   static const String usersEndpoint = '/api/usuarios';

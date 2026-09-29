@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../core/routes/app_routes.dart';
 import '../../core/theme/app_colors.dart';
 import '../../services/api_service.dart';
+import '../../services/user_service.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -13,8 +14,10 @@ class LoginScreen extends StatefulWidget {
 
 class _LoginScreenState extends State<LoginScreen> {
   final _formKey = GlobalKey<FormState>();
+  final UserService _userService = UserService();
   final _correoController = TextEditingController();
   final _contrasenaController = TextEditingController();
+
   bool _obscurePassword = true;
   bool _isLoading = false;
   String? _errorMessage;
@@ -27,29 +30,98 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   Future<void> _handleLogin() async {
-    if (!_formKey.currentState!.validate()) return;
+    // Evita enviar dos solicitudes mientras se comprueba el perfil.
+    if (_isLoading || !_formKey.currentState!.validate()) return;
 
     setState(() {
       _isLoading = true;
       _errorMessage = null;
     });
 
-    final result = await ApiService.login(
-      _correoController.text.trim(),
-      _contrasenaController.text.trim(),
-    );
+    try {
+      final result = await ApiService.login(
+        _correoController.text.trim(),
+        _contrasenaController.text.trim(),
+      );
 
-    if (!mounted) return;
-    setState(() {
-      _isLoading = false;
-    });
+      if (!mounted) return;
 
-    if (result['success'] == true) {
-      Navigator.of(context).pushReplacementNamed(AppRoutes.home);
-    } else {
+      if (result['success'] != true) {
+        setState(() {
+          _errorMessage =
+              result['message']?.toString() ?? 'Error al iniciar sesi\u00F3n';
+        });
+        return;
+      }
+
+      // El login identifica la cuenta; se conserva su manejo actual de sesión.
+      final rawData = result['data'];
+      if (rawData is! Map) {
+        throw Exception(
+          'El servidor respondi\u00F3 correctamente, pero faltan los datos del usuario.',
+        );
+      }
+
+      final rawUsuario = rawData['usuario'];
+      if (rawUsuario is! Map) {
+        throw Exception(
+          'No se recibi\u00F3 la informaci\u00F3n del usuario autenticado.',
+        );
+      }
+
+      final usuario = Map<String, dynamic>.from(rawUsuario);
+      final rawId = usuario['idUsuario'] ?? usuario['id_usuario'];
+      final userId = int.tryParse(rawId?.toString() ?? '');
+      if (userId == null || userId <= 0) {
+        throw Exception(
+          'No se recibi\u00F3 un identificador de usuario v\u00E1lido.',
+        );
+      }
+
+      // Consulta la API para obtener el perfil guardado, incluso en otro celular.
+      // Si falla la consulta, se muestra el error sin abrir la creación del perfil.
+      final user = await _userService.getUserById(userId);
+      if (!mounted) return;
+
+      // La creación exige apodo y permite guardar sin avatar.
+      final hasGamerProfile = user.apodo?.trim().isNotEmpty == true;
+
+      if (hasGamerProfile) {
+        // Quita el login y las pantallas anteriores del historial de navegación.
+        Navigator.of(context)
+            .pushNamedAndRemoveUntil('/home', (route) => false);
+        return;
+      }
+
+      // Solo las cuentas sin apodo guardado deben completar el perfil gamer.
+      // Se envían los datos actuales, no una copia anterior del login.
+      final profileData = <String, dynamic>{
+        ...usuario,
+        'idUsuario': user.idUsuario,
+        'nombreCompleto': user.nombreCompleto,
+        'correo': user.correo,
+        'apodo': user.apodo,
+        'idAvatar': user.idAvatar,
+        'xpTotal': user.xpTotal,
+        'monedas': user.monedas,
+        'gemas': user.gemas,
+      };
+
+      Navigator.of(
+        context,
+      ).pushReplacementNamed(AppRoutes.profileCreation, arguments: profileData);
+    } catch (error) {
+      if (!mounted) return;
       setState(() {
-        _errorMessage = result['message'] ?? 'Error al iniciar sesión';
+        _errorMessage = error.toString().replaceFirst('Exception: ', '');
       });
+    } finally {
+      // Mantiene el botón deshabilitado hasta terminar login y consulta de perfil.
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
     }
   }
 
@@ -72,7 +144,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    // Header Gamer Icon con acento dorado/coral
+                    // Icono gamer principal.
                     Center(
                       child: Container(
                         padding: const EdgeInsets.all(20),
@@ -98,9 +170,9 @@ class _LoginScreenState extends State<LoginScreen> {
                         ),
                       ),
                     ),
+
                     const SizedBox(height: 24),
 
-                    // Título y subtítulo
                     const Text(
                       'NEXPLAY',
                       textAlign: TextAlign.center,
@@ -111,9 +183,11 @@ class _LoginScreenState extends State<LoginScreen> {
                         letterSpacing: 3,
                       ),
                     ),
+
                     const SizedBox(height: 8),
+
                     const Text(
-                      'Inicia sesión para continuar tu aventura',
+                      'Inicia sesi\u00F3n para continuar tu aventura',
                       textAlign: TextAlign.center,
                       style: TextStyle(
                         fontSize: 14,
@@ -121,9 +195,10 @@ class _LoginScreenState extends State<LoginScreen> {
                         letterSpacing: 0.5,
                       ),
                     ),
+
                     const SizedBox(height: 32),
 
-                    // Tarjeta contenedora del formulario para estructura limpia y moderna
+                    // Contenedor del formulario.
                     Container(
                       padding: const EdgeInsets.all(24),
                       decoration: BoxDecoration(
@@ -141,7 +216,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.stretch,
                         children: [
-                          // Mensaje de error si existe
+                          // Error de autenticación.
                           if (_errorMessage != null) ...[
                             Container(
                               padding: const EdgeInsets.all(12),
@@ -164,7 +239,7 @@ class _LoginScreenState extends State<LoginScreen> {
                             const SizedBox(height: 20),
                           ],
 
-                          // Campo Correo
+                          // Correo electrónico.
                           TextFormField(
                             controller: _correoController,
                             keyboardType: TextInputType.emailAddress,
@@ -173,7 +248,7 @@ class _LoginScreenState extends State<LoginScreen> {
                               fontSize: 15,
                             ),
                             decoration: const InputDecoration(
-                              labelText: 'Correo electrónico',
+                              labelText: 'Correo electr\u00F3nico',
                               labelStyle: TextStyle(color: AppColors.textGray),
                               prefixIcon: Icon(
                                 Icons.email_outlined,
@@ -181,18 +256,21 @@ class _LoginScreenState extends State<LoginScreen> {
                               ),
                             ),
                             validator: (value) {
-                              if (value == null || value.isEmpty) {
+                              if (value == null || value.trim().isEmpty) {
                                 return 'Por favor ingresa tu correo';
                               }
+
                               if (!value.contains('@')) {
-                                return 'Ingresa un correo válido';
+                                return 'Ingresa un correo v\u00E1lido';
                               }
+
                               return null;
                             },
                           ),
+
                           const SizedBox(height: 20),
 
-                          // Campo Contraseña
+                          // Contraseña.
                           TextFormField(
                             controller: _contrasenaController,
                             obscureText: _obscurePassword,
@@ -201,7 +279,7 @@ class _LoginScreenState extends State<LoginScreen> {
                               fontSize: 15,
                             ),
                             decoration: InputDecoration(
-                              labelText: 'Contraseña',
+                              labelText: 'Contrase\u00F1a',
                               labelStyle: const TextStyle(
                                 color: AppColors.textGray,
                               ),
@@ -225,17 +303,20 @@ class _LoginScreenState extends State<LoginScreen> {
                             ),
                             validator: (value) {
                               if (value == null || value.isEmpty) {
-                                return 'Por favor ingresa tu contraseña';
+                                return 'Por favor ingresa tu contrase\u00F1a';
                               }
+
                               if (value.length < 4) {
-                                return 'La contraseña debe tener al menos 4 caracteres';
+                                return 'La contrase\u00F1a debe tener al menos 4 caracteres';
                               }
+
                               return null;
                             },
                           ),
+
                           const SizedBox(height: 28),
 
-                          // Botón Ingresar
+                          // Botón de inicio de sesión.
                           ElevatedButton(
                             onPressed: _isLoading ? null : _handleLogin,
                             style: ElevatedButton.styleFrom(
@@ -268,26 +349,27 @@ class _LoginScreenState extends State<LoginScreen> {
                         ],
                       ),
                     ),
+
                     const SizedBox(height: 24),
 
-                    // Pie informativo o nota gamer
+                    // Acceso al registro.
                     Wrap(
                       alignment: WrapAlignment.center,
                       crossAxisAlignment: WrapCrossAlignment.center,
                       children: [
                         const Text(
-                          '¿No tienes cuenta?',
+                          '\u00BFNo tienes cuenta?',
                           style: TextStyle(
                             color: AppColors.textGray,
                             fontSize: 13,
                           ),
                         ),
                         TextButton(
-                          onPressed: () =>
-                              Navigator.of(context)
-                                  .pushNamed(AppRoutes.register),
+                          onPressed: () {
+                            Navigator.of(context).pushNamed(AppRoutes.register);
+                          },
                           child: const Text(
-                            'Regístrate',
+                            'Reg\u00EDstrate',
                             style: TextStyle(
                               color: AppColors.secondary,
                               fontWeight: FontWeight.bold,

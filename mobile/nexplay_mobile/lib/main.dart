@@ -4,6 +4,7 @@ import 'core/routes/app_routes.dart';
 import 'core/theme/app_theme.dart';
 import 'features/games/games_screen.dart';
 import 'features/home/home_screen.dart';
+import 'features/profile/profile_screen.dart';
 import 'features/login/login_screen.dart';
 import 'features/profile_creation/profile_creation_screen.dart';
 import 'features/register/register_screen.dart';
@@ -35,6 +36,7 @@ class NexPlayApp extends StatelessWidget {
         AppRoutes.login: (_) => const LoginScreen(),
         AppRoutes.home: (_) => const HomeScreen(),
         AppRoutes.games: (_) => const GamesScreen(),
+        AppRoutes.profile: (_) => const ProfileScreen(),
       },
 
       // Crear Perfil necesita recibir los datos del usuario registrado,
