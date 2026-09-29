@@ -1,4 +1,4 @@
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using NexPlayAPI.Endpoints;
 using NexPlayAPI.Models;
 using NexPlayAPI.Services;
@@ -8,7 +8,7 @@ var builder = WebApplication.CreateBuilder(args);
 var connectionString = builder.Configuration
     .GetConnectionString("NexPlayConnection")
     ?? throw new InvalidOperationException(
-        "No se encontró la cadena de conexión NexPlayConnection."
+        "No se encontrÃ³ la cadena de conexiÃ³n NexPlayConnection."
     );
 
 builder.Services.AddDbContext<NexPlayContext>(options =>
@@ -35,6 +35,8 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
+
+app.UseStaticFiles();
 
 if (app.Environment.IsDevelopment())
 {
