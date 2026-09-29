@@ -2,6 +2,9 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import '../core/constants/api_constants.dart';
+import '../models/achievement_model.dart';
+import '../models/challenge_model.dart';
+import '../models/ranking_user_model.dart';
 
 class ApiService {
   // Login
@@ -35,5 +38,74 @@ class ApiService {
     } catch (e) {
       return {'success': false, 'message': 'Error de conexión: $e'};
     }
+  }
+
+  // Obtener Retos reales desde el Backend
+  static Future<List<ChallengeModel>> getRetos() async {
+    final url = Uri.parse('${ApiConstants.baseUrl}${ApiConstants.retosEndpoint}');
+    try {
+      final response = await http.get(url);
+      if (response.statusCode == 200) {
+        List<dynamic> body = jsonDecode(response.body);
+        return body.map((dynamic item) => ChallengeModel.fromJson(item)).toList();
+      } else {
+        return [];
+      }
+    } catch (e) {
+      return [];
+    }
+  }
+
+  // Obtener Logros reales desde el Backend
+  static Future<List<AchievementModel>> getLogros() async {
+    final url = Uri.parse('${ApiConstants.baseUrl}${ApiConstants.logrosEndpoint}');
+    try {
+      final response = await http.get(url);
+      if (response.statusCode == 200) {
+        List<dynamic> body = jsonDecode(response.body);
+        return body.map((dynamic item) => AchievementModel.fromJson(item)).toList();
+      } else {
+        return [];
+      }
+    } catch (e) {
+      return [];
+    }
+  }
+
+  // Obtener Ranking Global real desde el Backend
+  static Future<List<RankingUserModel>> getRankingGlobal() async {
+    final url = Uri.parse('${ApiConstants.baseUrl}${ApiConstants.rankingGlobalEndpoint}');
+    try {
+      final response = await http.get(url);
+      if (response.statusCode == 200) {
+        List<dynamic> body = jsonDecode(response.body);
+        return body.asMap().entries.map((entry) => RankingUserModel.fromJson(entry.value, index: entry.key)).toList();
+      } else {
+        return [];
+      }
+    } catch (e) {
+      return [];
+    }
+  }
+
+  // Obtener Ranking Semanal real desde el Backend
+  static Future<List<RankingUserModel>> getRankingSemanal() async {
+    final url = Uri.parse('${ApiConstants.baseUrl}${ApiConstants.rankingSemanalEndpoint}');
+    try {
+      final response = await http.get(url);
+      if (response.statusCode == 200) {
+        List<dynamic> body = jsonDecode(response.body);
+        return body.asMap().entries.map((entry) => RankingUserModel.fromJson(entry.value, index: entry.key)).toList();
+      } else {
+        return [];
+      }
+    } catch (e) {
+      return [];
+    }
+  }
+
+  // Obtener Ranking Mensual real desde el Backend
+  static Future<List<RankingUserModel>> getRankingMensual() async {
+    return [];
   }
 }
