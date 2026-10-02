@@ -327,9 +327,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
       },
     );
 
-    nameController.dispose();
-    nicknameController.dispose();
-
     if (saved == true) {
       await _loadProfile();
 
@@ -496,7 +493,7 @@ class _ProfileContent extends StatelessWidget {
                 ),
                 const SizedBox(height: 24),
                 const Text(
-                  'ESTADÍSTICAS DE CUENTA',
+                  'ESTAD\u00CDSTICAS DE CUENTA',
                   style: TextStyle(
                     color: AppColors.textPrimary,
                     fontSize: 16,
