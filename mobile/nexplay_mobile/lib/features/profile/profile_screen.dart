@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../../core/routes/app_routes.dart';
 import '../../core/theme/app_colors.dart';
 import '../../models/avatar_model.dart';
 import '../../models/user_model.dart';
@@ -82,6 +83,54 @@ class _ProfileScreenState extends State<ProfileScreen> {
         _error = e.toString().replaceFirst('Exception: ', '');
       });
     }
+  }
+
+  Future<void> _logout() async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (dialogContext) {
+        return AlertDialog(
+          backgroundColor: AppColors.panel,
+          title: const Text(
+            'CERRAR SESI\u00D3N',
+            style: TextStyle(
+              color: AppColors.textPrimary,
+              fontWeight: FontWeight.w900,
+            ),
+          ),
+          content: const Text(
+            '\u00BFSeguro que quieres cerrar sesi\u00F3n?',
+            style: TextStyle(color: AppColors.textSecondary),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(dialogContext).pop(false);
+              },
+              child: const Text('CANCELAR'),
+            ),
+            ElevatedButton.icon(
+              onPressed: () {
+                Navigator.of(dialogContext).pop(true);
+              },
+              icon: const Icon(Icons.logout_rounded),
+              label: const Text('CERRAR SESI\u00D3N'),
+            ),
+          ],
+        );
+      },
+    );
+
+    if (confirmed != true) return;
+
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.remove('auth_token');
+    await prefs.remove('user_id');
+
+    if (!mounted) return;
+
+    Navigator.of(context)
+        .pushNamedAndRemoveUntil(AppRoutes.login, (route) => false);
   }
 
   Future<void> _editProfile() async {
@@ -358,6 +407,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 onBack: () => Navigator.of(context).pop(),
                 onEdit: _editProfile,
                 onRefresh: _loadProfile,
+                onLogout: _logout,
               ),
       ),
     );
@@ -371,6 +421,7 @@ class _ProfileContent extends StatelessWidget {
     required this.onBack,
     required this.onEdit,
     required this.onRefresh,
+    required this.onLogout,
   });
 
   final UserModel user;
@@ -378,6 +429,7 @@ class _ProfileContent extends StatelessWidget {
   final VoidCallback onBack;
   final VoidCallback onEdit;
   final Future<void> Function() onRefresh;
+  final Future<void> Function() onLogout;
 
   @override
   Widget build(BuildContext context) {
@@ -576,6 +628,34 @@ class _ProfileContent extends StatelessWidget {
                     icon: const Icon(Icons.manage_accounts_rounded),
                     label: const Text(
                       'EDITAR PERFIL',
+                      style: TextStyle(
+                        fontWeight: FontWeight.w900,
+                        letterSpacing: 0.5,
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 12),
+                SizedBox(
+                  width: double.infinity,
+                  height: 54,
+                  child: OutlinedButton.icon(
+                    onPressed: () {
+                      onLogout();
+                    },
+                    style: OutlinedButton.styleFrom(
+                      foregroundColor: Colors.redAccent,
+                      side: const BorderSide(
+                        color: Colors.redAccent,
+                        width: 1.5,
+                      ),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(14),
+                      ),
+                    ),
+                    icon: const Icon(Icons.logout_rounded),
+                    label: const Text(
+                      'CERRAR SESI\u00D3N',
                       style: TextStyle(
                         fontWeight: FontWeight.w900,
                         letterSpacing: 0.5,
